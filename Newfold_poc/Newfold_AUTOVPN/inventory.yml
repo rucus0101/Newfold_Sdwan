@@ -1,0 +1,60 @@
+---
+all:
+  children:
+    NEWFOLD_WAN:
+      # children:
+      #   REGION1:
+          children:
+            DC1:
+              children:
+                DC1_WAN:
+                  vars:
+                    type: wan_rr
+                  hosts:
+                    dc1-wan1:
+                      ansible_host: 172.28.137.226
+                    dc1-wan2:
+                      ansible_host: 172.28.137.227
+
+               
+            DC2:
+              children:
+                DC2_WAN:
+                  vars:
+                    type: wan_rr
+                  hosts:
+                    dc2-wan1:
+                      ansible_host: 172.28.138.223
+                    dc2-wan2:
+                      ansible_host: 172.28.138.224
+
+              
+
+            CAMPUS:
+              children:
+                CAMPUS1:
+                  vars:
+                    type: wan_router
+                  hosts:
+                    campus1-wan1:
+                      ansible_host: 172.28.139.43
+                    campus1-wan2:
+                      ansible_host: 172.28.139.42
+                CAMPUS1_LEAF:
+                  vars:
+                    type: l3leaf
+                  hosts:
+                    campus1-leaf1:
+                      ansible_host: 172.28.138.135
+
+        # PATHFINDERS:
+        #   children:
+        #     WAN:
+        #       vars:
+        #         type: wan_rr
+        #       hosts:
+        #         pf1:
+        #           ansible_host: 172.28.143.238
+                  
+        #         pf2:
+        #           ansible_host: 172.28.143.226

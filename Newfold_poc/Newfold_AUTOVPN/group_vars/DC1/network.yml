@@ -1,0 +1,72 @@
+
+
+mgmt_interface: Management1/1
+wan_rr: # dynamic_key: node_type
+  defaults:
+    # cv_pathfinder_transit_mode: region
+    data_plane_cpu_allocation_max: 6
+    loopback_ipv4_pool: 10.1.0.0/26
+    vtep_loopback_ipv4_pool: 10.255.0.0/28
+   # uplink_ipv4_pool: 10.1.3.128/26
+   # uplink_type: p2p-vrfs # uplink to local switch
+   # uplink_interfaces: [ Ethernet2 ]
+   # uplink_switches: [ dc1-leaf1 ]
+    bgp_as: 65000
+    filter:
+      always_include_vrfs_in_tenants:
+        - dc1
+
+  node_groups:
+    - group: DC1_WAN
+      # structured_config:
+      #   ethernet_interfaces:
+      #     # This is raising the MTU on the HA interface specified above
+      #     - name: Ethernet3
+      #       mtu: 9100
+      nodes:
+        - name: dc1-wan1
+          id: 1
+          mgmt_ip: 172.28.137.226/17
+      #    uplink_switch_interfaces: [ Ethernet47 ]
+          l3_interfaces:
+            - name: Ethernet1/2
+              structured_config:
+                mtu: 9000
+              ip_address: 172.16.151.2/30
+              wan_carrier: INET-1
+              wan_circuit_id: DC1-INET1
+              peer_ip: 172.16.151.1
+              static_routes:
+                - prefix: 172.16.0.0/16
+            
+        - name: dc1-wan2
+          id: 2
+          mgmt_ip: 172.28.137.227/17
+       #   uplink_switch_interfaces: [ Ethernet48 ]
+          l3_interfaces:
+            - name: Ethernet1/2
+              structured_config:
+                mtu: 9000
+              ip_address: 172.16.152.2/30
+              wan_carrier: INET-2
+              wan_circuit_id: DC1-INET2
+              peer_ip: 172.16.152.1
+              static_routes:
+                - prefix: 172.16.0.0/16
+               
+         
+
+
+### LEAFS ###
+
+# vlan_internal_order:
+#   allocation: ascending
+#   range:
+#   beginning: 3800
+#   ending: 4000
+
+
+
+# custom_structured_configuration_eos_cli: |
+#  platform tfa personality arfa
+

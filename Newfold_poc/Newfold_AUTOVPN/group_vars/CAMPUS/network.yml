@@ -1,0 +1,72 @@
+
+mgmt_interface: Management1
+
+wan_router: # dynamic_key: node_type
+  defaults:
+    loopback_ipv4_pool: 10.1.2.0/26
+    vtep_loopback_ipv4_pool: 10.1.2.64/26
+    uplink_ipv4_pool: 10.1.2.128/26
+    uplink_interface_speed: 1g
+    uplink_type: p2p-vrfs # uplink to local switch
+    uplink_interfaces: [ Ethernet1 ]
+    uplink_switches: [ campus1-leaf1 ]
+    bgp_as: 65000
+    filter:
+      always_include_vrfs_in_tenants:
+        - campus1
+
+  node_groups:
+    - group: WAN_CAMPUS1
+      nodes:
+        - name: campus1-wan1
+          id: 1
+          mgmt_ip: 172.28.139.43/20
+          uplink_switch_interfaces: [ Ethernet1 ]
+          l3_interfaces:
+            - name: Ethernet2
+              structured_config:
+                mtu: 9000
+              ip_address: 172.16.123.2/30
+              wan_carrier: INET-1
+              wan_circuit_id: CAMPUS1-WAN1-INET
+              peer_ip: 172.16.123.1
+              static_routes:
+                - prefix: 172.16.0.0/16
+        - name: campus1-wan2
+          id: 2
+          mgmt_ip: 172.28.139.42/20
+          uplink_switch_interfaces: [ Ethernet2 ]
+          l3_interfaces:
+            - name: Ethernet2
+              structured_config:
+                mtu: 9000
+              ip_address: 172.16.124.2/30
+              wan_carrier: INET-2
+              wan_circuit_id: CAMPUS1-WAN2-INET
+              peer_ip: 172.16.124.1
+              static_routes:
+                - prefix: 172.16.0.0/16
+
+### LEAFS ###
+
+l3leaf: # dynamic_key: node_type
+  defaults:
+    platform: cEOSLab
+    loopback_ipv4_pool: 10.1.2.0/26
+    vtep_loopback_ipv4_pool: 10.1.2.64/26
+    uplink_ipv4_pool: 10.1.2.128/26
+    # mlag_interfaces: [Ethernet5, Ethernet6]
+    # mlag_peer_ipv4_pool: 10.103.3.0/24
+    spanning_tree_mode: mstp
+    spanning_tree_priority: 16384
+  nodes:
+    - name: campus1-leaf1
+      id: 3
+      mgmt_interface: Management1
+      mgmt_ip: 172.28.138.135/20
+      bgp_as: 65012
+
+
+# custom_structured_configuration_eos_cli: |
+# platform tfa personality arfa
+

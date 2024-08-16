@@ -1,0 +1,137 @@
+---
+
+wan_mode: autovpn
+wan_stun_dtls_disable: true
+cv_pathfinder_regions:
+  - name: Region1
+    id: 1
+    sites:
+      - name: DC1
+        id: 101
+        location: San Jose, CA
+      - name: DC2
+        location: New Orleans, LA
+        id: 102
+      - name: CAMPUS1
+        id: 111
+        location: New York, New York
+      - name: PATHFINDERS
+        id: 255
+        location: Singapore, Singapore
+ 
+
+# cv_pathfinder_regions:
+#   - name: Global
+#     id: 1
+#     sites:
+#       - name: REGION1_SITE1
+#         id: 101
+#       - name: REGION1_SITE2
+#         id: 102
+#       - name: REGION1_HUB
+#         id: 111
+#       - name: REGION2_SITE1
+#         id: 103
+#       - name: REGION2_SITE2
+#         id: 104
+#       - name: REGION2_HUB
+#         id: 112
+
+
+bgp_peer_groups:
+  wan_overlay_peers:
+    bfd_timers:
+      interval: 15000
+      min_rx: 15000
+      multiplier: 3   
+    password: "htm4AZe9mIQOO1uiMuGgYQ=="
+    listen_range_prefixes:
+      - 10.0.0.0/9
+    
+
+wan_route_servers:
+  - hostname: dc1-wan1
+    vtep_ip: 10.255.0.1
+    path_groups:
+      - name: INET
+        interfaces:
+          - name: Ethernet1/2
+            public_ip: 172.16.151.2
+     
+    
+
+  - hostname: dc1-wan2
+    vtep_ip: 10.255.0.2
+    path_groups:
+      - name: INET
+        interfaces:
+          - name: Ethernet1/2
+            public_ip: 172.16.152.2
+    
+  
+  - hostname: dc2-wan1
+    vtep_ip: 10.255.1.1
+    path_groups:
+      - name: INET
+        interfaces:
+          - name: Ethernet1/1
+            public_ip: 172.16.113.2
+    
+  - hostname: dc2-wan2
+    vtep_ip: 10.255.1.2
+    path_groups:
+      - name: INET
+        interfaces:
+          - name: Ethernet1/1
+            public_ip: 172.16.114.2
+
+wan_ipsec_profiles:
+  control_plane:
+    shared_key: 0110100A480E0A0E231D1E
+  data_plane:
+    shared_key: 0110100A480E0A0E231D1E
+
+wan_path_groups:
+  - name: INET
+    ipsec:
+      static_peers: true
+      dynamic_peers: true
+    dps_keepalive:
+      interval: 500
+      failure_threshold: 3
+    id: 101
+  
+
+wan_carriers:
+  - name: INET-1
+    path_group: INET
+    trusted: true
+  - name: INET-2
+    path_group: INET
+    trusted: true
+ 
+wan_virtual_topologies:
+  vrfs:
+    - name: default
+      policy: DEFAULT-POLICY
+      wan_vni: 1
+    - name: customer2
+      policy: DEFAULT-POLICY
+      wan_vni: 2  
+    - name: customer3
+      policy: DEFAULT-POLICY
+      wan_vni: 3  
+   
+
+
+  
+  policies:
+    - name: DEFAULT-POLICY
+      default_virtual_topology:
+        path_groups:
+          - names: [INET]
+            preference: preferred
+   
+
+
+
